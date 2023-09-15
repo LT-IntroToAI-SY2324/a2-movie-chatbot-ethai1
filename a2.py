@@ -1,6 +1,5 @@
 from typing import List
 
-
 def match(pattern: List[str], source: List[str]) -> List[str]:
     """Attempts to match the pattern to the source.
 
@@ -14,6 +13,7 @@ def match(pattern: List[str], source: List[str]) -> List[str]:
         None if the pattern and source do not "match" ELSE A list of matched words
         (words in the source corresponding to _'s or %'s, in the pattern, if any)
     """
+
     source_index = 0  # current index we are looking at in source list
     pattern_index = 0  # current index we are looking at in pattern list
     result: List[str] = []  # to store substitutions we will return if matched
@@ -22,25 +22,44 @@ def match(pattern: List[str], source: List[str]) -> List[str]:
     # pind is still a valid index OR sind is still a valid index (valid index means that
     # the index is != to the length of the list)
     while source_index < len(source) and pattern_index < len(pattern):
+
         # 1) if we reached the end of the pattern but not source
         if pattern_index == len(pattern) - 1 and source_index < len(source) - 1:
-            print("PATTERN IS GREATER THAN SOURCE. RETURNING NULL")
-            return None
+            # print(pattern[pattern_index])
+            if pattern[pattern_index] != "%":
+                print("PATTERN IS GREATER THAN SOURCE. RETURNING NULL")
+                return None
         
         # 2) if the current thing in the pattern is a %
         # WARNING: this condition contains the bulk of the code for the assignment
         # If you get stuck on this one, we encourage you to attempt the other conditions
         #   and come back to this one afterwards
 
-        elif pattern[pattern_index] == "%":
-            end_of_pattern = pattern[pattern_index + 1]
-            pattern_index += 1
-            
-            while source[source_index] != end_of_pattern:
-                result.append(source[source_index])
-                source_index += 1
-            
 
+        elif pattern[pattern_index] == "%":
+            print("IN HERE")
+            text: List[str] = []
+
+            if pattern_index == len(pattern) - 1:
+                while source_index < len(source) - 1:
+                    text.append(source[source_index])
+                    source_index += 1
+
+                joined = " ".join(text)
+                result.append(joined)
+
+            else:     
+                end_of_pattern = pattern[pattern_index + 1]
+                print(f"END OF PATTERN: {end_of_pattern}")
+
+                while source[source_index] != end_of_pattern:
+                    text.append(source[source_index])
+                    source_index += 1
+
+                joined = " ".join(text)
+                # print(joined)
+                result.append(joined)
+            
         # 3) if we reached the end of the source but not the pattern
         elif source_index == len(source) - 1 and pattern_index < len(pattern) - 1:
             print("SOURCE IS LARGER THAN PATTERN. RETURNING NULL")
@@ -49,6 +68,8 @@ def match(pattern: List[str], source: List[str]) -> List[str]:
         # 4) if the current thing in the pattern is an _
         elif pattern[pattern_index] == "_":
             result.append(source[source_index])
+            source_index += 1
+            pattern_index += 1
 
         # 5) if the current thing in the pattern is the same as the current thing in the
         # source
@@ -67,7 +88,6 @@ def match(pattern: List[str], source: List[str]) -> List[str]:
     return result
 
 
-# TEST 5, INFINITE LOOP
 if __name__ == "__main__":
     assert match(["x", "y", "z"], ["x", "y", "z"]) == [], "test 1 failed"
     assert match(["x", "z", "z"], ["x", "y", "z"]) == None, "test 2 failed"
