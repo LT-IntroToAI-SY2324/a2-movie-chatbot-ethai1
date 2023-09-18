@@ -21,27 +21,26 @@ def match(pattern: List[str], source: List[str]) -> List[str]:
     # keep checking as long as we haven't hit the end of either pattern or source while
     # pind is still a valid index OR sind is still a valid index (valid index means that
     # the index is != to the length of the list)
-    while source_index < len(source) and pattern_index < len(pattern):
-
+    while source_index < len(source) or pattern_index < len(pattern):
         # 1) if we reached the end of the pattern but not source
-        if pattern_index == len(pattern) - 1 and source_index < len(source) - 1:
-            # print(pattern[pattern_index])
-            if pattern[pattern_index] != "%":
-                print("PATTERN IS GREATER THAN SOURCE. RETURNING NULL")
-                return None
+        if pattern_index == len(pattern) - 1 and source_index < len(source) - 1 and pattern[pattern_index] != "%":
+            print("PATTERN IS GREATER THAN SOURCE. RETURNING NULL")
+            return None
         
         # 2) if the current thing in the pattern is a %
         # WARNING: this condition contains the bulk of the code for the assignment
         # If you get stuck on this one, we encourage you to attempt the other conditions
         #   and come back to this one afterwards
 
-
         elif pattern[pattern_index] == "%":
-            print("IN HERE")
             text: List[str] = []
 
+            if pattern_index > source_index:
+                result.append("")
+                break
+
             if pattern_index == len(pattern) - 1:
-                while source_index < len(source) - 1:
+                while source_index < len(source):
                     text.append(source[source_index])
                     source_index += 1
 
@@ -50,26 +49,27 @@ def match(pattern: List[str], source: List[str]) -> List[str]:
 
             else:     
                 end_of_pattern = pattern[pattern_index + 1]
-                print(f"END OF PATTERN: {end_of_pattern}")
+                # print(f"END OF PATTERN: {end_of_pattern}")
 
                 while source[source_index] != end_of_pattern:
                     text.append(source[source_index])
                     source_index += 1
 
                 joined = " ".join(text)
-                # print(joined)
                 result.append(joined)
+            pattern_index += 1
             
         # 3) if we reached the end of the source but not the pattern
         elif source_index == len(source) - 1 and pattern_index < len(pattern) - 1:
-            print("SOURCE IS LARGER THAN PATTERN. RETURNING NULL")
-            return None
+            if pattern[pattern_index + 1] != "%":
+                print("SOURCE IS LARGER THAN PATTERN. RETURNING NULL")
+                return None
         
         # 4) if the current thing in the pattern is an _
         elif pattern[pattern_index] == "_":
             result.append(source[source_index])
             source_index += 1
-            pattern_index += 1
+            pattern_index += 1 
 
         # 5) if the current thing in the pattern is the same as the current thing in the
         # source
@@ -100,14 +100,14 @@ if __name__ == "__main__":
     assert match(["%", "z"], ["x", "y", "z"]) == ["x y"], "test 9 failed"
     assert match(["x", "%", "y"], ["x", "y", "z"]) == None, "test 10 failed"
     assert match(["x", "%", "y", "z"], ["x", "y", "z"]) == [""], "test 11 failed"
-    assert match(["x", "y", "z", "%"], ["x", "y", "z"]) == [""], "test 12 failed"
+    assert match(["x", "y", "z", "%"], ["x", "y", "z"]) == [""], "test 12 failed" # FAILED
     assert match(["_", "%"], ["x", "y", "z"]) == ["x", "y z"], "test 13 failed"
     assert match(["_", "_", "_", "%"], ["x", "y", "z"]) == [
         "x",
         "y",
         "z",
         "",
-    ], "test 14 failed"
+    ], "test 14 failed" # FAILED
     # this last case is a strange one, but it exposes an issue with the way we've
     # written our match function
     assert match(["x", "%", "z"], ["x", "y", "z", "z", "z"]) == None, "test 15 failed"
