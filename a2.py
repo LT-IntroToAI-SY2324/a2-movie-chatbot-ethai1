@@ -24,25 +24,25 @@ def match(pattern: List[str], source: List[str]) -> List[str]:
     while source_index < len(source) or pattern_index < len(pattern):
 
         # 1) if we reached the end of the pattern but not source
-        if pattern_index == len(pattern) - 1 and source_index < len(source) - 1 and pattern[pattern_index] != "%":
+        if pattern_index == len(pattern) and source_index < len(source):
             return None
         
         # 2) if the current thing in the pattern is a %
         elif pattern[pattern_index] == "%":
             text: List[str] = []
 
+            # pattern is longer than source, putting space at the end
             if pattern_index > source_index:
                 result.append("")
                 break
 
+            # % is the last thing in pattern so we append everything in source to text
             if pattern_index == len(pattern) - 1:
                 while source_index < len(source):
                     text.append(source[source_index])
                     source_index += 1
 
-                joined = " ".join(text)
-                result.append(joined)
-
+            # % isn't the end of pattern, appending everything until we hit the next element in pattern
             else:     
                 end_of_pattern = pattern[pattern_index + 1]
 
@@ -50,22 +50,13 @@ def match(pattern: List[str], source: List[str]) -> List[str]:
                     text.append(source[source_index])
                     source_index += 1
 
-                joined = " ".join(text)
-                result.append(joined)
+            joined = " ".join(text)
+            result.append(joined)
             pattern_index += 1
             
         # 3) if we reached the end of the source but not the pattern
-        elif source_index == len(source) - 1 and pattern_index < len(pattern) - 1:
-            if pattern[pattern_index + 1] != "%":
-                return None
-            
-            if pattern[pattern_index] == "_":
-                result.append(source[source_index])
-                source_index += 1
-                pattern_index += 1
-                continue
-
-            pattern_index += 1
+        elif source_index == len(source) and pattern_index < len(pattern):
+            return None
         
         # 4) if the current thing in the pattern is an _
         elif pattern[pattern_index] == "_":
