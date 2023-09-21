@@ -29,29 +29,23 @@ def match(pattern: List[str], source: List[str]) -> List[str]:
         
         # 2) if the current thing in the pattern is a %
         elif pattern[pattern_index] == "%":
-            text: List[str] = []
 
-            # pattern is longer than source, putting space at the end
-            if pattern_index > source_index:
-                result.append("")
-                break
-
-            # % is the last thing in pattern so we append everything in source to text
+            # % is the last thing in pattern so we append everything in source from index to end to text
             if pattern_index == len(pattern) - 1:
-                while source_index < len(source):
+                result.append(" ".join(source[source_index:]))
+                return result
+
+            # if source doesn't have the next element in pattern, it will throw an index out of range error
+            try:
+                # % isn't the end of pattern, appending everything in source to text until we hit the next element in pattern   
+                text: List[str] = []
+                while source[source_index] != pattern[pattern_index + 1]:
                     text.append(source[source_index])
                     source_index += 1
+            except IndexError:
+                return None
 
-            # % isn't the end of pattern, appending everything until we hit the next element in pattern
-            else:     
-                end_of_pattern = pattern[pattern_index + 1]
-
-                while source[source_index] != end_of_pattern:
-                    text.append(source[source_index])
-                    source_index += 1
-
-            joined = " ".join(text)
-            result.append(joined)
+            result.append(" ".join(text))
             pattern_index += 1
             
         # 3) if we reached the end of the source but not the pattern
@@ -78,7 +72,6 @@ def match(pattern: List[str], source: List[str]) -> List[str]:
 
     return result
 
-
 if __name__ == "__main__":
     assert match(["x", "y", "z"], ["x", "y", "z"]) == [], "test 1 failed"
     assert match(["x", "z", "z"], ["x", "y", "z"]) == None, "test 2 failed"
@@ -102,5 +95,5 @@ if __name__ == "__main__":
     # this last case is a strange one, but it exposes an issue with the way we've
     # written our match function
     assert match(["x", "%", "z"], ["x", "y", "z", "z", "z"]) == None, "test 15 failed"
-
+    assert match(["%", "z"], ["x", "y", "w"]) == None, "test 16 failed"
     print("All tests passed!")
