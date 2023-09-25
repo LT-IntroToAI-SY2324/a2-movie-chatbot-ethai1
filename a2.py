@@ -38,14 +38,13 @@ def match(pattern: List[str], source: List[str]) -> List[str]:
             # if source doesn't have the next element in pattern, it will throw an index out of range error
             try:
                 # % isn't the end of pattern, appending everything in source to text until we hit the next element in pattern   
-                text: List[str] = []
+                temp = source_index
                 while source[source_index] != pattern[pattern_index + 1]:
-                    text.append(source[source_index])
                     source_index += 1
             except IndexError:
                 return None
 
-            result.append(" ".join(text))
+            result.append(" ".join(source[temp:source_index]))
             pattern_index += 1
             
         # 3) if we reached the end of the source but not the pattern
@@ -58,15 +57,13 @@ def match(pattern: List[str], source: List[str]) -> List[str]:
             source_index += 1
             pattern_index += 1 
 
-        # 5) if the current thing in the pattern is the same as the current thing in the
-        # source
+        # 5) if the current thing in the pattern is the same as the current thing in the source
         elif source[source_index] == pattern[pattern_index]:
             source_index += 1
             pattern_index += 1
 
-        # 6) else : this will happen if none of the other conditions are met it
-        # indicates the current thing it pattern doesn't match the current thing in
-        # source
+        # 6) else : this will happen if none of the other conditions are met it indicates 
+        # the current thing it pattern doesn't match the current thing in source
         else:
             return None
 
@@ -92,8 +89,6 @@ if __name__ == "__main__":
         "z",
         "",
     ], "test 14 failed"
-    # this last case is a strange one, but it exposes an issue with the way we've
-    # written our match function
     assert match(["x", "%", "z"], ["x", "y", "z", "z", "z"]) == None, "test 15 failed"
     assert match(["%", "z"], ["x", "y", "w"]) == None, "test 16 failed"
     print("All tests passed!")
